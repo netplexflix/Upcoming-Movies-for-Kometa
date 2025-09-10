@@ -8,7 +8,7 @@
 <sub>See also [Upcoming TV Shows for Kometa](https://github.com/netplexflix/Upcoming-TV-Shows-for-Kometa)</sub>
 
 ## Example:
-<img width="1166" height="360" alt="Image" src="https://github.com/user-attachments/assets/9681c5f5-82f3-4789-8181-760ef5dc211e" />
+<img width="971" height="360" alt="Image" src="https://github.com/user-attachments/assets/0017063c-2147-41ec-9430-3ecef82ef16d" />
 
 ---
 ## 🛠️ Installation
