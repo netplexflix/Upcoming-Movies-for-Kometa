@@ -1,0 +1,79 @@
+################################################################################
+##########                   RADARR CONFIGURATION:                    ##########
+################################################################################
+radarr_url: 'http://localhost:7878'
+radarr_api_key: 'YOUR_RADARR_API_KEY'
+
+################################################################################
+##########                         GENERAL:                           ##########
+################################################################################
+utc_offset: +1
+future_days_upcoming_movies: 30
+future_only: false
+include_inCinemas: false
+debug: false
+cleanup: true
+
+# Path mapping (useful for Docker/unRAID environments)
+  # Map Sonarr's internal paths to actual filesystem paths
+  # Format: sonarr_path: actual_path
+path_mapping:
+  "/movies": "/mnt/user/media/movies"
+
+
+################################################################################
+##########                UPCOMING MOVIES COLLECTION:                 ##########
+################################################################################
+collection_upcoming_movies:
+  collection_name: "ComingSoon"
+  item_label: Coming Soon
+  non_item_remove_label: Coming Soon
+  build_collection: false
+
+################################################################################
+##########              UPCOMING MOVIES OVERLAY FUTURE:               ##########
+################################################################################  
+backdrop_upcoming_movies_future:
+  enable: true
+  back_color: "#EB3233"
+  back_height: 90
+  back_width: 950
+  horizontal_align: center
+  horizontal_offset: 0
+  vertical_align: top
+  vertical_offset: 20
+
+text_upcoming_movies_future:
+  use_text: "EXPECTED"
+  date_format: "d mmm"
+  capitalize_dates: true
+  horizontal_align: center
+  horizontal_offset: 0
+  vertical_align: top
+  vertical_offset: 35
+  font_size: 70
+  font_color: "#FFFFFF"
+
+################################################################################
+##########             UPCOMING MOVIES OVERLAY RELEASED:              ##########
+################################################################################  
+backdrop_upcoming_movies_released:
+  enable: true
+  back_color: "#EB3233"
+  back_height: 90
+  back_width: 950
+  horizontal_align: center
+  horizontal_offset: 0
+  vertical_align: top
+  vertical_offset: 20
+
+text_upcoming_movies_released:
+  use_text: "COMING SOON"
+  date_format: "d mmm"
+  capitalize_dates: true
+  horizontal_align: center
+  horizontal_offset: 0
+  vertical_align: top
+  vertical_offset: 35
+  font_size: 70
+  font_color: "#FFFFFF"
