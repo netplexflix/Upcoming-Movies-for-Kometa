@@ -5,6 +5,9 @@
 -  creating placeholders video files in special {edition-Coming Soon} folders so the movies get picked up by Plex.
 -  creating collection and overlay .yml files which can be used with [Kometa](https://kometa.wiki/en/latest/) (formerly Plex Meta Manager).
 
+>[!note]
+> UMFK uses Plex's 'editions' feature which requires a Plex Pass subscription for Server admin account.
+
 <sub>See also [Upcoming TV Shows for Kometa](https://github.com/netplexflix/Upcoming-TV-Shows-for-Kometa)</sub>
 
 ## Example:
