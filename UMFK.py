@@ -7,7 +7,7 @@ from pathlib import Path
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
 
-VERSION = "beta2509102230"
+VERSION = "beta2509112000"
 
 # ANSI color codes
 GREEN = '\033[32m'
@@ -475,6 +475,7 @@ def format_date(yyyy_mm_dd, date_format, capitalize=False):
 
 def create_overlay_yaml(output_file, future_movies, released_movies, config_sections):
     """Create overlay YAML file with movies grouped by release status and date"""
+    import yaml
 
     if not future_movies and not released_movies:
         with open(output_file, "w", encoding="utf-8") as f:
@@ -500,7 +501,10 @@ def create_overlay_yaml(output_file, future_movies, released_movies, config_sect
         enable_backdrop = backdrop_config.pop("enable", True)
         
         if enable_backdrop and all_future_tmdb_ids:
-            backdrop_config["name"] = "backdrop"
+            # Set default name if not provided in config
+            if "name" not in backdrop_config:
+                backdrop_config["name"] = "backdrop"
+            
             all_tmdb_ids_str = ", ".join(str(i) for i in sorted(all_future_tmdb_ids) if i)
             
             overlays_dict["backdrop_future"] = {
@@ -520,7 +524,14 @@ def create_overlay_yaml(output_file, future_movies, released_movies, config_sect
             for date_str in sorted(date_to_tmdb_ids):
                 formatted_date = format_date(date_str, date_format, capitalize_dates)
                 sub_overlay_config = deepcopy(text_config)
-                sub_overlay_config["name"] = f"text({use_text} {formatted_date})"
+                
+                # Set default name if not provided in config
+                if "name" not in sub_overlay_config:
+                    sub_overlay_config["name"] = f"text({use_text} {formatted_date})"
+                else:
+                    # If name is provided in config, append the formatted date
+                    base_name = sub_overlay_config["name"]
+                    sub_overlay_config["name"] = f"{base_name}({use_text} {formatted_date})"
                 
                 tmdb_ids_for_date = sorted(tmdb_id for tmdb_id in date_to_tmdb_ids[date_str] if tmdb_id)
                 tmdb_ids_str = ", ".join(str(i) for i in tmdb_ids_for_date)
@@ -544,7 +555,10 @@ def create_overlay_yaml(output_file, future_movies, released_movies, config_sect
         enable_backdrop = backdrop_config.pop("enable", True)
         
         if enable_backdrop and all_released_tmdb_ids:
-            backdrop_config["name"] = "backdrop"
+            # Set default name if not provided in config
+            if "name" not in backdrop_config:
+                backdrop_config["name"] = "backdrop"
+            
             all_tmdb_ids_str = ", ".join(str(i) for i in sorted(all_released_tmdb_ids) if i)
             
             overlays_dict["backdrop_released"] = {
@@ -563,7 +577,14 @@ def create_overlay_yaml(output_file, future_movies, released_movies, config_sect
             text_config.pop("capitalize_dates", None)
             
             sub_overlay_config = deepcopy(text_config)
-            sub_overlay_config["name"] = f"text({use_text})"
+            
+            # Set default name if not provided in config
+            if "name" not in sub_overlay_config:
+                sub_overlay_config["name"] = f"text({use_text})"
+            else:
+                # If name is provided in config, append the use_text
+                base_name = sub_overlay_config["name"]
+                sub_overlay_config["name"] = f"{base_name}({use_text})"
             
             tmdb_ids_str = ", ".join(str(i) for i in sorted(all_released_tmdb_ids) if i)
             
@@ -579,6 +600,10 @@ def create_overlay_yaml(output_file, future_movies, released_movies, config_sect
 
 def create_collection_yaml(output_file, future_movies, released_movies, config):
     """Create collection YAML file"""
+    import yaml
+    from yaml.representer import SafeRepresenter
+    from collections import OrderedDict
+
     # Add representer for OrderedDict
     def represent_ordereddict(dumper, data):
         return dumper.represent_mapping('tag:yaml.org,2002:map', data.items())
@@ -594,9 +619,11 @@ def create_collection_yaml(output_file, future_movies, released_movies, config):
         collection_config = deepcopy(config[config_key])
         collection_name = collection_config.pop("collection_name", "Upcoming Movies")
     
-    # Get the future_days value for summary
-    future_days = config.get('future_days_upcoming_movies', 30)
-    summary = f"Movies releasing within {future_days} days or already released but not yet available"
+    # Get the future_days value for summary (only if not overridden in config)
+    if "summary" not in collection_config:
+        future_days = config.get('future_days_upcoming_movies', 30)
+        summary = f"Movies releasing within {future_days} days or already released but not yet available"
+        collection_config["summary"] = summary
     
     class QuotedString(str):
         pass
@@ -611,18 +638,24 @@ def create_collection_yaml(output_file, future_movies, released_movies, config):
     
     # Handle the case when no movies are found
     if not all_movies:
+        # Use default fallback structure but allow config overrides
+        fallback_config = {
+            "plex_search": {
+                "all": {
+                    "label": collection_name
+                }
+            },
+            "item_label.remove": collection_name,
+            "smart_label": "random",
+            "build_collection": False
+        }
+        
+        # Override with any config values
+        fallback_config.update(collection_config)
+        
         data = {
             "collections": {
-                collection_name: {
-                    "plex_search": {
-                        "all": {
-                            "label": collection_name
-                        }
-                    },
-                    "item_label.remove": collection_name,
-                    "smart_label": "random",
-                    "build_collection": False
-                }
+                collection_name: fallback_config
             }
         }
         
@@ -632,17 +665,23 @@ def create_collection_yaml(output_file, future_movies, released_movies, config):
     
     tmdb_ids = [m['tmdbId'] for m in all_movies if m.get('tmdbId')]
     if not tmdb_ids:
+        # Use default fallback structure but allow config overrides
+        fallback_config = {
+            "plex_search": {
+                "all": {
+                    "label": collection_name
+                }
+            },
+            "non_item_remove_label": collection_name,
+            "build_collection": False
+        }
+        
+        # Override with any config values
+        fallback_config.update(collection_config)
+        
         data = {
             "collections": {
-                collection_name: {
-                    "plex_search": {
-                        "all": {
-                            "label": collection_name
-                        }
-                    },
-                    "non_item_remove_label": collection_name,
-                    "build_collection": False
-                }
+                collection_name: fallback_config
             }
         }
         
@@ -654,29 +693,28 @@ def create_collection_yaml(output_file, future_movies, released_movies, config):
     tmdb_ids_str = ", ".join(str(i) for i in sorted(tmdb_ids))
 
     # Create the collection data structure
-    collection_data = {}
-    collection_data["summary"] = summary
+    collection_data = deepcopy(collection_config)
     
-    # Add all remaining parameters from the collection config
-    for key, value in collection_config.items():
-        if key == "sort_title":
-            collection_data[key] = QuotedString(value)
-        else:
-            collection_data[key] = value
+    # Add default sync_mode if not provided in config
+    if "sync_mode" not in collection_data:
+        collection_data["sync_mode"] = "sync"
     
-    # Add sync_mode after the config parameters
-    collection_data["sync_mode"] = "sync"
-    
-    # Add tmdb_movie as the last item
+    # Add tmdb_movie (this should always be set by the script)
     collection_data["tmdb_movie"] = tmdb_ids_str
 
     # Create the final structure with ordered keys
     ordered_collection = OrderedDict()
     
-    # Add keys in the desired order
-    ordered_collection["summary"] = collection_data["summary"]
+    # Add summary first if it exists
+    if "summary" in collection_data:
+        ordered_collection["summary"] = collection_data["summary"]
+    
+    # Add sort_title second if it exists
     if "sort_title" in collection_data:
-        ordered_collection["sort_title"] = collection_data["sort_title"]
+        if isinstance(collection_data["sort_title"], str):
+            ordered_collection["sort_title"] = QuotedString(collection_data["sort_title"])
+        else:
+            ordered_collection["sort_title"] = collection_data["sort_title"]
     
     # Add all other keys except sync_mode and tmdb_movie
     for key, value in collection_data.items():
