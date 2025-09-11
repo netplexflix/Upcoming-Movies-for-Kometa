@@ -11,7 +11,11 @@
 <sub>See also [Upcoming TV Shows for Kometa](https://github.com/netplexflix/Upcoming-TV-Shows-for-Kometa)</sub>
 
 ## Example:
+Default:<br>
 <img width="971" height="360" alt="Image" src="https://github.com/user-attachments/assets/0017063c-2147-41ec-9430-3ecef82ef16d" />
+
+red_frame:<br>
+<img width="777" height="356" alt="Image" src="https://github.com/user-attachments/assets/588ff92e-ac42-4d80-9d3a-31eac52a7961" />
 
 ---
 ## 🛠️ Installation
