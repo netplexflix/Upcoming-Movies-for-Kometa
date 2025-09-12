@@ -1,34 +1,37 @@
 #!/bin/bash
 set -e
 
-# Clone repo if /app is empty
+# Ensure /app exists
+mkdir -p /app
+
+# Clone or update repo
 if [ -z "$(ls -A /app)" ]; then
     echo "[INFO] /app is empty, cloning repo..."
-    git clone https://github.com/ThatCasualMatt/Upcoming-Movies-for-Kometa.git /app
+    git clone "${REPO}" /app
+else
+    echo "[INFO] /app already has files, pulling latest changes..."
+    cd /app
+    git pull || echo "[WARN] git pull failed"
 fi
 
-cd /app
-git pull || echo "[WARN] git pull failed"
-
-# Cron schedule (default 2AM)
+# Set cron schedule
 CRON_SCHEDULE="${CRON:-0 2 * * *}"
 
-# Run immediately if RUN_NOW=true
+# Run immediately if requested
 if [ "$RUN_NOW" = "true" ]; then
     echo "[INFO] RUN_NOW flag detected. Running UMFK.py immediately..."
     cd /app
-    DOCKER=true /usr/local/bin/python /app/UMFK.py 2>&1 | tee -a /var/log/cron.log
+    DOCKER=true python3 /app/UMFK.py 2>&1 | tee -a /var/log/cron.log
 fi
 
-# Create cron job
-echo "$CRON_SCHEDULE root cd /app && DOCKER=true /usr/local/bin/python /app/UMFK.py >> /var/log/cron.log 2>&1" > /etc/cron.d/umfk-cron
+# Setup cron job
+echo "$CRON_SCHEDULE root cd /app && DOCKER=true python3 /app/UMFK.py >> /var/log/cron.log 2>&1" > /etc/cron.d/umfk-cron
 chmod 0644 /etc/cron.d/umfk-cron
 crontab /etc/cron.d/umfk-cron
 
-echo "[INFO] UMFK will also run according to cron schedule: $CRON_SCHEDULE"
-
-# Ensure log file exists
+# Ensure log exists
 touch /var/log/cron.log
 
-# Start dcron in foreground to keep container alive
+# Start cron in foreground
+echo "[INFO] Starting cron with schedule: $CRON_SCHEDULE"
 crond -f -l 2
