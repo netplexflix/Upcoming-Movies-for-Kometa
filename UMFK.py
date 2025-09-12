@@ -501,7 +501,7 @@ def format_date(yyyy_mm_dd, date_format, capitalize=False):
 def create_overlay_yaml(output_file, future_movies, released_movies, config_sections):
     """Create overlay YAML file with movies grouped by release status and date"""
     # Ensure the directory exists
-    output_dir = "/config/kometa/tssk/" if IS_DOCKER else "kometa/"
+    output_dir = "/config/kometa/umfk/" if IS_DOCKER else "kometa/"
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, output_file)
     
@@ -629,6 +629,11 @@ def create_overlay_yaml(output_file, future_movies, released_movies, config_sect
         yaml.dump(final_output, f, sort_keys=False)
 
 def create_collection_yaml(output_file, future_movies, released_movies, config):
+    # Ensure the directory exists
+    output_dir = "/config/kometa/umfk/" if IS_DOCKER else "kometa/"
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, output_file)
+    
     """Create collection YAML file"""
     import yaml
     from yaml.representer import SafeRepresenter
