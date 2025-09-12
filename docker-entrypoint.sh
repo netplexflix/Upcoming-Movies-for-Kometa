@@ -1,6 +1,15 @@
 #!/bin/bash
 set -e
 
+# Clone repo if /app is empty
+if [ -z "$(ls -A /app)" ]; then
+    echo "[INFO] /app is empty, cloning repo..."
+    git clone https://github.com/netplexflix/Upcoming-Movies-for-Kometa.git /app
+fi
+
+cd /app
+git pull || echo "[WARN] git pull failed"
+
 # Cron schedule (default 2AM)
 CRON_SCHEDULE="${CRON:-0 2 * * *}"
 
