@@ -7,6 +7,7 @@ from pathlib import Path
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
 
+IS_DOCKER = os.getenv("DOCKER", "false").lower() == "true"
 VERSION = "beta2509121700"
 
 # ANSI color codes
@@ -499,6 +500,11 @@ def format_date(yyyy_mm_dd, date_format, capitalize=False):
 
 def create_overlay_yaml(output_file, future_movies, released_movies, config_sections):
     """Create overlay YAML file with movies grouped by release status and date"""
+    # Ensure the directory exists
+    output_dir = "/config/kometa/tssk/" if IS_DOCKER else "kometa/"
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, output_file)
+    
     import yaml
 
     if not future_movies and not released_movies:
