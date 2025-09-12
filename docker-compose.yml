@@ -1,7 +1,7 @@
 services:
   umfk:
     build:
-      context: https://github.com/ThatCasualMatt/Upcoming-Movies-for-Kometa.git#main
+      context: https://github.com/netplexflix/Upcoming-Movies-for-Kometa.git#main
       dockerfile: Dockerfile
     container_name: umfk
     environment:
