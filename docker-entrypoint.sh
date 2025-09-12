@@ -4,7 +4,7 @@ set -e
 # Clone repo if /app is empty
 if [ -z "$(ls -A /app)" ]; then
     echo "[INFO] /app is empty, cloning repo..."
-    git clone https://github.com/netplexflix/Upcoming-Movies-for-Kometa.git /app
+    git clone https://github.com/ThatCasualMatt/Upcoming-Movies-for-Kometa.git /app
 fi
 
 cd /app
