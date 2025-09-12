@@ -870,7 +870,8 @@ def main():
                            "text_released": config.get("text_upcoming_movies_released", {})})
         
         create_collection_yaml(str(collection_file), future_movies, released_movies, config)
-        
+        print(kometa_folder)
+        print(overlay_file)
         print(f"\n{GREEN}YAML files created successfully in Kometa folder{RESET}")
         
         # Calculate and display runtime
