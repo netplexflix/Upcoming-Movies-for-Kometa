@@ -1,5 +1,5 @@
 services:
-  tssk:
+  umfk:
     build:
       context: https://github.com/ThatCasualMatt/Upcoming-Movies-for-Kometa#main
       dockerfile: Dockerfile
