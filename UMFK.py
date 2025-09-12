@@ -856,8 +856,8 @@ def main():
                 print(f"{BLUE}[DEBUG] Placeholder cleanup is disabled{RESET}")
         
         # ---- Create Kometa subfolder ----
-        kometa_folder = "/config/kometa/umfk/" if IS_DOCKER else "kometa/"
-        os.makedirs(output_dir, exist_ok=True)
+        kometa_folder = Path("/config/kometa/umfk") if IS_DOCKER else Path("kometa/")
+        os.makedirs(kometa_folder, exist_ok=True)
                 
         # ---- Create YAML Files ----
         overlay_file = kometa_folder / "UMFK_MOVIES_UPCOMING_OVERLAYS.yml"
@@ -870,8 +870,7 @@ def main():
                            "text_released": config.get("text_upcoming_movies_released", {})})
         
         create_collection_yaml(str(collection_file), future_movies, released_movies, config)
-        print(kometa_folder)
-        print(overlay_file)
+
         print(f"\n{GREEN}YAML files created successfully in Kometa folder{RESET}")
         
         # Calculate and display runtime
