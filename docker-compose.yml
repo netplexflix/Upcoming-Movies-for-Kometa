@@ -5,9 +5,10 @@ services:
       dockerfile: Dockerfile
     container_name: umfk
     environment:
-      - CRON=0 2 * * *  # daily at 2AM
+      - CRON=0 2 * * *     # daily at 2AM
       - DOCKER=true
-      - RUN_NOW=false  # set true to run immediately on container start
+      - RUN_NOW=true       # run immediately on container start
+      - REPO=https://github.com/netplexflix/Upcoming-Movies-for-Kometa.git
     volumes:
       - /your/local/config/umfk:/app/config
       - /your/local/kometa/config:/config/kometa
