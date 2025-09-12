@@ -11,4 +11,5 @@ services:
     volumes:
       - /your/local/config/umfk:/app/config
       - /your/local/kometa/config:/config/kometa
+      - /your/local/media/movies:/movies
     restart: unless-stopped
