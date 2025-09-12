@@ -12,9 +12,9 @@ if [ "$RUN_NOW" = "true" ]; then
 fi
 
 # Create cron job
-echo "$CRON_SCHEDULE root cd /app && DOCKER=true /usr/local/bin/python /app/TSSK.py >> /var/log/cron.log 2>&1" > /etc/cron.d/tssk-cron
-chmod 0644 /etc/cron.d/tssk-cron
-crontab /etc/cron.d/tssk-cron
+echo "$CRON_SCHEDULE root cd /app && DOCKER=true /usr/local/bin/python /app/UMFK.py >> /var/log/cron.log 2>&1" > /etc/cron.d/umfk-cron
+chmod 0644 /etc/cron.d/umfk-cron
+crontab /etc/cron.d/umfk-cron
 
 echo "[INFO] UMFK will also run according to cron schedule: $CRON_SCHEDULE"
 
