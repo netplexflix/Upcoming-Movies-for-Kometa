@@ -1,0 +1,14 @@
+services:
+  tssk:
+    build:
+      context: https://github.com/ThatCasualMatt/Upcoming-Movies-for-Kometa#main
+      dockerfile: Dockerfile
+    container_name: umfk
+    environment:
+      - CRON=0 2 * * *  # daily at 2AM
+      - DOCKER=true
+      - RUN_NOW=false  # set true to run immediately on container start
+    volumes:
+      - /your/local/config/umfk:/app/config
+      - /your/local/kometa/config:/config/kometa
+    restart: unless-stopped
