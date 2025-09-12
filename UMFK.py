@@ -7,7 +7,7 @@ from pathlib import Path
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
 
-VERSION = "beta2509112000"
+VERSION = "beta2509121700"
 
 # ANSI color codes
 GREEN = '\033[32m'
@@ -132,6 +132,30 @@ def map_path(original_path, path_mappings):
     
     return original_path
 
+def sanitize_filename(filename):
+    """Sanitize filename/folder name for Windows compatibility, especially UNC paths"""
+    # Dictionary of invalid characters and their replacements
+    replacements = {
+        ':': ' -',      # Colon to dash
+        '/': '-',       # Forward slash to dash  
+        '\\': '-',      # Backslash to dash
+        '?': '',        # Question mark removed
+        '*': '',        # Asterisk removed
+        '"': "'",       # Double quote to single quote
+        '<': '(',       # Less than to parenthesis
+        '>': ')',       # Greater than to parenthesis
+        '|': '-',       # Pipe to dash
+    }
+    
+    sanitized = filename
+    for invalid_char, replacement in replacements.items():
+        sanitized = sanitized.replace(invalid_char, replacement)
+    
+    # Remove any trailing dots or spaces (Windows restriction)
+    sanitized = sanitized.rstrip('. ')
+    
+    return sanitized
+
 def find_upcoming_movies(radarr_url, api_key, future_days_upcoming_movies, utc_offset=0, future_only=False, include_inCinemas=False, debug=False):
     """Find movies that are monitored and meet release date criteria"""
     future_movies = []
@@ -253,11 +277,11 @@ def create_placeholder_video(movie, config, debug=False):
     movie_year = movie.get('year', '')
     tmdb_id = movie.get('tmdbId', '')
     
-    # Folder name: "Movie title (yyyy) {edition-Coming Soon}"
-    folder_name = f"{movie_title} ({movie_year}) {{edition-Coming Soon}}"
-    
-    # File name: "Movie title (yyyy) {tmdb-xxx} {edition-Coming Soon}"
-    file_name = f"{movie_title} ({movie_year}) {{tmdb-{tmdb_id}}} {{edition-Coming Soon}}"
+    # Folder name: "Movie title (yyyy) {edition-Coming Soon}" - sanitized for Windows
+    folder_name = sanitize_filename(f"{movie_title} ({movie_year}) {{edition-Coming Soon}}")
+
+    # File name: "Movie title (yyyy) {tmdb-xxx} {edition-Coming Soon}" - sanitized for Windows  
+    file_name = sanitize_filename(f"{movie_title} ({movie_year}) {{tmdb-{tmdb_id}}} {{edition-Coming Soon}}")
     
     # Create the Coming Soon folder
     base_path = Path(mapped_path)
@@ -312,10 +336,10 @@ def cleanup_placeholder_videos(radarr_url, api_key, config, future_movies, relea
             base_path = Path(mapped_path)
             parent_dir = base_path.parent
             
-            # Use new naming convention
+            # Use new naming convention with sanitization
             movie_title = movie.get('title', 'Unknown')
             movie_year = movie.get('year', '')
-            folder_name = f"{movie_title} ({movie_year}) {{edition-Coming Soon}}"
+            folder_name = sanitize_filename(f"{movie_title} ({movie_year}) {{edition-Coming Soon}}")
             coming_soon_path = parent_dir / folder_name
             valid_coming_soon_paths.add(str(coming_soon_path))
     
@@ -330,10 +354,10 @@ def cleanup_placeholder_videos(radarr_url, api_key, config, future_movies, relea
         base_path = Path(mapped_path)
         parent_dir = base_path.parent
         
-        # Use new naming convention
+        # Use new naming convention with sanitization
         movie_title = movie.get('title', 'Unknown')
         movie_year = movie.get('year', '')
-        folder_name = f"{movie_title} ({movie_year}) {{edition-Coming Soon}}"
+        folder_name = sanitize_filename(f"{movie_title} ({movie_year}) {{edition-Coming Soon}}")
         coming_soon_path = parent_dir / folder_name
         radarr_movie_lookup[str(coming_soon_path)] = movie
     
