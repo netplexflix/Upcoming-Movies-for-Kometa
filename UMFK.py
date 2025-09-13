@@ -1,12 +1,14 @@
 import requests
 import yaml
 import sys
+import os
 import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
 
+IS_DOCKER = os.getenv("DOCKER", "false").lower() == "true"
 VERSION = "beta2509121700"
 
 # ANSI color codes
@@ -854,9 +856,9 @@ def main():
                 print(f"{BLUE}[DEBUG] Placeholder cleanup is disabled{RESET}")
         
         # ---- Create Kometa subfolder ----
-        kometa_folder = Path(__file__).parent / "Kometa"
-        kometa_folder.mkdir(exist_ok=True)
-        
+        kometa_folder = Path("/config/kometa/umfk") if IS_DOCKER else Path("kometa/")
+        os.makedirs(kometa_folder, exist_ok=True)
+                
         # ---- Create YAML Files ----
         overlay_file = kometa_folder / "UMFK_MOVIES_UPCOMING_OVERLAYS.yml"
         collection_file = kometa_folder / "UMFK_MOVIES_UPCOMING_COLLECTION.yml"
@@ -868,7 +870,7 @@ def main():
                            "text_released": config.get("text_upcoming_movies_released", {})})
         
         create_collection_yaml(str(collection_file), future_movies, released_movies, config)
-        
+
         print(f"\n{GREEN}YAML files created successfully in Kometa folder{RESET}")
         
         # Calculate and display runtime
